@@ -64,8 +64,10 @@ public class bookerApplication extends Application<bookerConfiguration> {
 
     private void createDatabaseIfNotExists(final bookerConfiguration configuration) throws ClassNotFoundException, SQLException {
 
-        String databaseName = "bookerdb";
-        String port = "5444";
+        databaseConfig databaseConfig = configuration.getDatabaseConfig();
+
+        String databaseName = databaseConfig.getName();
+        String port = databaseConfig.getPort();
 
         String user = configuration.getDatabaseAppDataSourceFactory().getUser();
         String password = configuration.getDatabaseAppDataSourceFactory().getPassword();

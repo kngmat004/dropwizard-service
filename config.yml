@@ -13,6 +13,10 @@ server:
       port: 8096
 
 
+databaseConfig:
+  name: bookerdb
+  port: 5444
+
 database:
   # the name of your JDBC driver
   driverClass: org.postgresql.Driver
