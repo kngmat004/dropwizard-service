@@ -7,6 +7,8 @@ import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import knightinc.core.Person;
+import knightinc.dao.PersonDAO;
+import knightinc.resources.PersonResource;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
@@ -64,6 +66,8 @@ public class BookerApplication extends Application<BookerConfiguration> {
         createDatabaseIfNotExists(configuration);
 
         runMigrations(configuration);
+
+        registerResources(environment);
     }
 
     private Connection openConnection(final BookerConfiguration configuration) throws SQLException, ClassNotFoundException {
@@ -85,7 +89,6 @@ public class BookerApplication extends Application<BookerConfiguration> {
     }
 
     private void createDatabaseIfNotExists(final BookerConfiguration configuration) throws ClassNotFoundException, SQLException {
-
         DatabaseConfig DatabaseConfig = configuration.getDatabaseConfig();
 
         String databaseName = DatabaseConfig.getName();
@@ -95,7 +98,7 @@ public class BookerApplication extends Application<BookerConfiguration> {
         String password = configuration.getDatabaseAppDataSourceFactory().getPassword();
 
         String connectionString = String.format("jdbc:postgresql://localhost:%s/", port);
-        logger.warn("Create database if not exists...{}", databaseName);
+        logger.info("Create database if not exists...{}", databaseName);
         logger.info(connectionString);
 
         Class.forName("org.postgresql.Driver");
@@ -120,8 +123,8 @@ public class BookerApplication extends Application<BookerConfiguration> {
     }
 
 
-    public void runMigrations(final BookerConfiguration configuration) throws LiquibaseException, SQLException, ClassNotFoundException {
-        logger.warn("Running Liquibase migrations...");
+    private void runMigrations(final BookerConfiguration configuration) throws LiquibaseException, SQLException, ClassNotFoundException {
+        logger.info("Running Liquibase migrations...");
 
         Connection connection = openConnection(configuration);
 
@@ -130,6 +133,16 @@ public class BookerApplication extends Application<BookerConfiguration> {
         Liquibase liquibase = new liquibase.Liquibase("db/migrations.xml", new ClassLoaderResourceAccessor(), database);
 
         liquibase.update(new Contexts(), new LabelExpression());
+    }
+
+
+    private void registerResources(final Environment environment) {
+        logger.info("Registering resources...");
+        final PersonDAO personDAO = new PersonDAO(hibernate.getSessionFactory());
+
+        final PersonResource personResource = new PersonResource(personDAO);
+
+        environment.jersey().register(personResource);
     }
 
 }
