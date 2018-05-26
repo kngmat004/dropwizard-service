@@ -7,6 +7,14 @@ import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import knightinc.core.Person;
+import liquibase.Contexts;
+import liquibase.LabelExpression;
+import liquibase.Liquibase;
+import liquibase.database.Database;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,17 +57,31 @@ public class bookerApplication extends Application<bookerConfiguration> {
 
     @Override
     public void run(final bookerConfiguration configuration,
-                    final Environment environment) {
+                    final Environment environment) throws LiquibaseException, SQLException, ClassNotFoundException {
         logger.info("Application start...");
-        try {
-            createDatabaseIfNotExists(configuration);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
-        }
 
+        // if anything fails here we do not want the application to continue.
+        createDatabaseIfNotExists(configuration);
+
+        runMigrations(configuration);
+    }
+
+    private Connection openConnection(final bookerConfiguration configuration) throws SQLException, ClassNotFoundException {
+        databaseConfig databaseConfig = configuration.getDatabaseConfig();
+        String databaseName = databaseConfig.getName();
+        String port = databaseConfig.getPort();
+
+        String user = configuration.getDatabaseAppDataSourceFactory().getUser();
+        String password = configuration.getDatabaseAppDataSourceFactory().getPassword();
+
+        String connectionString = String.format("jdbc:postgresql://localhost:%s/%s", port, databaseName);
+        logger.info(connectionString);
+
+        Class.forName("org.postgresql.Driver");
+        Connection connection = null;
+        connection = DriverManager.getConnection(connectionString, user, password);
+
+        return connection;
     }
 
     private void createDatabaseIfNotExists(final bookerConfiguration configuration) throws ClassNotFoundException, SQLException {
@@ -78,7 +100,7 @@ public class bookerApplication extends Application<bookerConfiguration> {
 
         Class.forName("org.postgresql.Driver");
         Connection connection = null;
-        connection = DriverManager.getConnection(connectionString,user, password);
+        connection = DriverManager.getConnection(connectionString, user, password);
 
         ResultSet executeQuery = connection.createStatement().executeQuery("SELECT datname FROM pg_database;");
 
@@ -95,6 +117,19 @@ public class bookerApplication extends Application<bookerConfiguration> {
             logger.info(databaseName + " already exists");
         }
         connection.close();
+    }
+
+
+    public void runMigrations(final bookerConfiguration configuration) throws LiquibaseException, SQLException, ClassNotFoundException {
+        logger.info("Running Liquibase migrations...");
+
+        Connection connection = openConnection(configuration);
+
+        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+
+        Liquibase liquibase = new liquibase.Liquibase("db/migrations.xml", new ClassLoaderResourceAccessor(), database);
+
+        liquibase.update(new Contexts(), new LabelExpression());
     }
 
 }
