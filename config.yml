@@ -24,7 +24,7 @@ database:
   password: admin
 
   # the JDBC URL
-  url: jdbc:postgresql://localhost:5444/BookerDB
+  url: jdbc:postgresql://localhost:5444/bookerdb
 
   # any properties specific to your JDBC driver:
   properties:
