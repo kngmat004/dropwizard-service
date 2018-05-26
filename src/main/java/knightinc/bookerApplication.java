@@ -3,8 +3,10 @@ package knightinc;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
+import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import knightinc.core.Person;
 
 public class bookerApplication extends Application<bookerConfiguration> {
 
@@ -27,8 +29,13 @@ public class bookerApplication extends Application<bookerConfiguration> {
 
     @Override
     public void initialize(final Bootstrap<bookerConfiguration> bootstrap) {
-
-        // TODO: run flyway migrations...
+        bootstrap.addBundle(hibernate);
+        bootstrap.addBundle(new MigrationsBundle<bookerConfiguration>() {
+            @Override
+            public DataSourceFactory getDataSourceFactory(bookerConfiguration configuration) {
+                return configuration.getDatabaseAppDataSourceFactory();
+            }
+        });
     }
 
     @Override
