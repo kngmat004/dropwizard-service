@@ -4,6 +4,8 @@ import io.dropwizard.hibernate.AbstractDAO;
 import knightinc.core.Person;
 import org.hibernate.SessionFactory;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 
 public class PersonDAO extends AbstractDAO<Person> {
@@ -13,7 +15,10 @@ public class PersonDAO extends AbstractDAO<Person> {
     }
 
     public List<Person> getAll() {
-        return (List<Person>) currentSession().createCriteria(Person.class).list();
+        CriteriaBuilder builder = currentSession().getCriteriaBuilder();
+        CriteriaQuery<Person> criteriaQuery = builder.createQuery(Person.class);
+        criteriaQuery.from(Person.class);
+        return currentSession().createQuery(criteriaQuery).getResultList();
     }
 
     public Person findById(int id) {

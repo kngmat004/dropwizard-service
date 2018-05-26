@@ -2,23 +2,21 @@ package knightinc.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "PERSON")
+@Table(name = "Person")
 public class Person {
 
     @Id
-    @Column(name = "ID", nullable = false)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     @NotNull
     @JsonProperty
     private Integer id;
 
-    @Column(name = "NAME", length = 100, nullable = false)
+    @Column(name = "name", length = 100, nullable = false)
     @NotNull
     @JsonProperty
     private String name;

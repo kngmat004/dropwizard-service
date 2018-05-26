@@ -2,8 +2,12 @@ package knightinc.resources;
 
 
 import io.dropwizard.hibernate.UnitOfWork;
+import knightinc.BookerApplication;
 import knightinc.core.Person;
 import knightinc.dao.PersonDAO;
+import org.postgresql.util.PSQLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -15,6 +19,7 @@ import java.util.List;
 @Consumes({MediaType.APPLICATION_JSON})
 @Produces({MediaType.APPLICATION_JSON})
 public class PersonResource {
+    private final static Logger logger = LoggerFactory.getLogger(PersonResource.class);
 
     PersonDAO personDAO;
 
@@ -25,6 +30,7 @@ public class PersonResource {
     @GET
     @UnitOfWork
     public List<Person> getAll(){
+        logger.debug("Get all persons");
         return personDAO.getAll();
     }
 
@@ -32,6 +38,7 @@ public class PersonResource {
     @Path("/{id}")
     @UnitOfWork
     public Person get(@PathParam("id") Integer id){
+        logger.debug("Get individual person:  {}", id);
         return personDAO.findById(id);
     }
 
