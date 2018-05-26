@@ -2,7 +2,7 @@ package knightinc;
 
 import javax.validation.constraints.NotNull;
 
-public class databaseConfig {
+public class DatabaseConfig {
 
     @NotNull
     String name;

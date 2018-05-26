@@ -25,11 +25,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class bookerApplication extends Application<bookerConfiguration> {
-    private final static Logger logger = LoggerFactory.getLogger(bookerApplication.class);
+public class BookerApplication extends Application<BookerConfiguration> {
+    private final static Logger logger = LoggerFactory.getLogger(BookerApplication.class);
 
     public static void main(final String[] args) throws Exception {
-        new bookerApplication().run(args);
+        new BookerApplication().run(args);
     }
 
     @Override
@@ -37,28 +37,28 @@ public class bookerApplication extends Application<bookerConfiguration> {
         return "booker";
     }
 
-    private final HibernateBundle<bookerConfiguration> hibernate = new HibernateBundle<bookerConfiguration>(Person.class) {
+    private final HibernateBundle<BookerConfiguration> hibernate = new HibernateBundle<BookerConfiguration>(Person.class) {
         @Override
-        public DataSourceFactory getDataSourceFactory(bookerConfiguration configuration) {
+        public DataSourceFactory getDataSourceFactory(BookerConfiguration configuration) {
             return configuration.getDatabaseAppDataSourceFactory();
         }
     };
 
     @Override
-    public void initialize(final Bootstrap<bookerConfiguration> bootstrap) {
+    public void initialize(final Bootstrap<BookerConfiguration> bootstrap) {
         bootstrap.addBundle(hibernate);
-        bootstrap.addBundle(new MigrationsBundle<bookerConfiguration>() {
+        bootstrap.addBundle(new MigrationsBundle<BookerConfiguration>() {
             @Override
-            public DataSourceFactory getDataSourceFactory(bookerConfiguration configuration) {
+            public DataSourceFactory getDataSourceFactory(BookerConfiguration configuration) {
                 return configuration.getDatabaseAppDataSourceFactory();
             }
         });
     }
 
     @Override
-    public void run(final bookerConfiguration configuration,
+    public void run(final BookerConfiguration configuration,
                     final Environment environment) throws LiquibaseException, SQLException, ClassNotFoundException {
-        logger.info("Application start...");
+        logger.warn("Application start...");
 
         // if anything fails here we do not want the application to continue.
         createDatabaseIfNotExists(configuration);
@@ -66,10 +66,10 @@ public class bookerApplication extends Application<bookerConfiguration> {
         runMigrations(configuration);
     }
 
-    private Connection openConnection(final bookerConfiguration configuration) throws SQLException, ClassNotFoundException {
-        databaseConfig databaseConfig = configuration.getDatabaseConfig();
-        String databaseName = databaseConfig.getName();
-        String port = databaseConfig.getPort();
+    private Connection openConnection(final BookerConfiguration configuration) throws SQLException, ClassNotFoundException {
+        DatabaseConfig DatabaseConfig = configuration.getDatabaseConfig();
+        String databaseName = DatabaseConfig.getName();
+        String port = DatabaseConfig.getPort();
 
         String user = configuration.getDatabaseAppDataSourceFactory().getUser();
         String password = configuration.getDatabaseAppDataSourceFactory().getPassword();
@@ -84,18 +84,18 @@ public class bookerApplication extends Application<bookerConfiguration> {
         return connection;
     }
 
-    private void createDatabaseIfNotExists(final bookerConfiguration configuration) throws ClassNotFoundException, SQLException {
+    private void createDatabaseIfNotExists(final BookerConfiguration configuration) throws ClassNotFoundException, SQLException {
 
-        databaseConfig databaseConfig = configuration.getDatabaseConfig();
+        DatabaseConfig DatabaseConfig = configuration.getDatabaseConfig();
 
-        String databaseName = databaseConfig.getName();
-        String port = databaseConfig.getPort();
+        String databaseName = DatabaseConfig.getName();
+        String port = DatabaseConfig.getPort();
 
         String user = configuration.getDatabaseAppDataSourceFactory().getUser();
         String password = configuration.getDatabaseAppDataSourceFactory().getPassword();
 
         String connectionString = String.format("jdbc:postgresql://localhost:%s/", port);
-        logger.info("Create database if not exists...{}", databaseName);
+        logger.warn("Create database if not exists...{}", databaseName);
         logger.info(connectionString);
 
         Class.forName("org.postgresql.Driver");
@@ -120,8 +120,8 @@ public class bookerApplication extends Application<bookerConfiguration> {
     }
 
 
-    public void runMigrations(final bookerConfiguration configuration) throws LiquibaseException, SQLException, ClassNotFoundException {
-        logger.info("Running Liquibase migrations...");
+    public void runMigrations(final BookerConfiguration configuration) throws LiquibaseException, SQLException, ClassNotFoundException {
+        logger.warn("Running Liquibase migrations...");
 
         Connection connection = openConnection(configuration);
 

@@ -7,12 +7,12 @@ import io.dropwizard.db.DataSourceFactory;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
-public class bookerConfiguration extends Configuration {
+public class BookerConfiguration extends Configuration {
 
     @Valid
     @NotNull
     @JsonProperty("databaseConfig")
-    private databaseConfig databaseConfig;
+    private DatabaseConfig databaseConfig;
 
     @Valid
     @NotNull
@@ -20,7 +20,7 @@ public class bookerConfiguration extends Configuration {
     private DataSourceFactory database = new DataSourceFactory();
 
 
-    public knightinc.databaseConfig getDatabaseConfig() {
+    public DatabaseConfig getDatabaseConfig() {
         return databaseConfig;
     }
 
