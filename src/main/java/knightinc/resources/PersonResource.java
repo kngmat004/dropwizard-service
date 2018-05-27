@@ -32,6 +32,7 @@ public class PersonResource {
     public List<Person> getAll(){
         logger.debug("Get all persons");
         return personDAO.getAll();
+        //return personDAO.findAll();
     }
 
     @GET

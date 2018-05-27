@@ -21,6 +21,10 @@ public class PersonDAO extends AbstractDAO<Person> {
         return currentSession().createQuery(criteriaQuery).getResultList();
     }
 
+    public List<Person> findAll() {
+        return list(namedQuery("knightinc.core.core.Person.findAll"));
+    }
+
     public Person findById(int id) {
         return (Person) currentSession().get(Person.class, id);
     }

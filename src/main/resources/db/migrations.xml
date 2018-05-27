@@ -9,10 +9,10 @@
     <changeSet id="1" author="mknight">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="Person"/>
+                <tableExists tableName="PERSON"/>
             </not>
         </preConditions>
-        <createTable tableName="Person">
+        <createTable tableName="PERSON">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

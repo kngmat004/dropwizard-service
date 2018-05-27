@@ -6,7 +6,14 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "Person")
+@Table(name = "PERSON")
+@NamedQueries(
+    {
+            @NamedQuery(
+                    name = "knightinc.core.core.Person.findAll",
+                    query = "SELECT p FROM Person p"
+            )
+    })
 public class Person {
 
     @Id
