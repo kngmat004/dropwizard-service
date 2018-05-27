@@ -4,7 +4,8 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
 
     <changeSet id="1" author="mknight">
         <preConditions onFail="MARK_RAN">
@@ -12,13 +13,14 @@
                 <tableExists tableName="PERSON"/>
             </not>
         </preConditions>
-        <createTable tableName="PERSON">
+        <createTable tableName="people">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="NAME" type="varchar(100)">
+            <column name="fullName" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="jobTitle" type="varchar(255)"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>

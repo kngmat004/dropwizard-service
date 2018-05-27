@@ -2,6 +2,7 @@ package knightinc.resources;
 
 
 import io.dropwizard.hibernate.UnitOfWork;
+import io.dropwizard.jersey.params.LongParam;
 import knightinc.BookerApplication;
 import knightinc.core.Person;
 import knightinc.dao.PersonDAO;
@@ -13,6 +14,7 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Optional;
 
 
 @Path("/person")
@@ -32,30 +34,29 @@ public class PersonResource {
     public List<Person> getAll(){
         logger.debug("Get all persons");
         return personDAO.getAll();
-        //return personDAO.findAll();
     }
 
     @GET
     @Path("/{id}")
     @UnitOfWork
-    public Person get(@PathParam("id") Integer id){
+    public Optional<Person> get(@PathParam("id") LongParam id){
         logger.debug("Get individual person:  {}", id);
-        return personDAO.findById(id);
+        return personDAO.findById(id.get());
     }
 
     @POST
     @UnitOfWork
     public Person add(@Valid Person person) {
-        Person newPerson = personDAO.insert(person);
-
-        return newPerson;
+        logger.debug("Create person: {}", person.getFullName());
+        return personDAO.insert(person);
     }
 
     @PUT
     @Path("/{id}")
     @UnitOfWork
-    public Person update(@PathParam("id") Integer id, @Valid Person person) {
-        person = person.setId(id);
+    public Person update(@PathParam("id") LongParam id, @Valid Person person) {
+        logger.debug("Update person: {}", id);
+        person = person.setId(id.get());
         personDAO.update(person);
 
         return person;
@@ -64,7 +65,13 @@ public class PersonResource {
     @DELETE
     @Path("/{id}")
     @UnitOfWork
-    public void delete(@PathParam("id") Integer id) {
-        personDAO.delete(personDAO.findById(id));
+    public void delete(@PathParam("id") LongParam id) throws NotFoundException {
+        logger.debug("Delete person: {}", id);
+        Person toBeDeletedPerson = findSafely(id.get());
+        personDAO.delete(toBeDeletedPerson);
+    }
+
+    private Person findSafely(long personId) {
+        return personDAO.findById(personId).orElseThrow(() -> new NotFoundException("No such user."));
     }
 }

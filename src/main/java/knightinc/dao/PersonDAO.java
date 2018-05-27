@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
+import java.util.Optional;
 
 public class PersonDAO extends AbstractDAO<Person> {
 
@@ -25,10 +26,6 @@ public class PersonDAO extends AbstractDAO<Person> {
         return list(namedQuery("knightinc.core.core.Person.findAll"));
     }
 
-    public Person findById(int id) {
-        return (Person) currentSession().get(Person.class, id);
-    }
-
     public void delete(Person person) {
         currentSession().delete(person);
     }
@@ -40,4 +37,9 @@ public class PersonDAO extends AbstractDAO<Person> {
     public Person insert(Person person) {
         return persist(person);
     }
+
+    public Optional<Person> findById(Long id) {
+        return Optional.ofNullable(get(id));
+    }
+
 }

@@ -1,77 +1,80 @@
 package knightinc.core;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
-@Table(name = "PERSON")
+@Table(name = "people")
 @NamedQueries(
-    {
-            @NamedQuery(
-                    name = "knightinc.core.core.Person.findAll",
-                    query = "SELECT p FROM Person p"
-            )
-    })
+        {
+                @NamedQuery(
+                        name = "knightinc.core.core.Person.findAll",
+                        query = "SELECT p FROM Person p"
+                )
+        })
 public class Person {
-
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    @NotNull
-    @JsonProperty
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-    @Column(name = "name", length = 100, nullable = false)
-    @NotNull
-    @JsonProperty
-    private String name;
+    @Column(name = "fullName", nullable = false)
+    private String fullName;
 
-    public Integer getId() {
+    @Column(name = "jobTitle", nullable = false)
+    private String jobTitle;
+
+    public Person() {
+    }
+
+    public Person(String fullName, String jobTitle) {
+        this.fullName = fullName;
+        this.jobTitle = jobTitle;
+    }
+
+    public long getId() {
         return id;
     }
 
-    public Person setId(Integer id) {
+    public Person setId(long id) {
         this.id = id;
         return this;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public Person setName(String name) {
-        this.name = name;
-        return this;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Person)) {
+            return false;
+        }
 
-        Person person = (Person) o;
+        final Person that = (Person) o;
 
-        if (id != null ? !id.equals(person.id) : person.id != null) return false;
-        if (name != null ? !name.equals(person.name) : person.name != null) return false;
-
-        return true;
+        return Objects.equals(this.id, that.id) &&
+                Objects.equals(this.fullName, that.fullName) &&
+                Objects.equals(this.jobTitle, that.jobTitle);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Person{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
+        return Objects.hash(id, fullName, jobTitle);
     }
 }
 
